@@ -13,11 +13,14 @@ namespace DogGo.Controllers
     public class OwnersController : Controller
     {
         private readonly OwnerRepository _ownerRepo;
+        private readonly DogRepository _dogRepo;
+
 
         // The constructor accepts an IConfiguration object as a parameter. This class comes from the ASP.NET framework and is useful for retrieving things out of the appsettings.json file like connection strings.
         public OwnersController(IConfiguration config)
         {
             _ownerRepo = new OwnerRepository(config);
+             _dogRepo = new DogRepository(config);
         }
 
 
@@ -38,6 +41,8 @@ namespace DogGo.Controllers
             {
                 return NotFound();
             }
+
+            owner.Dogs = _dogRepo.GetDogsByOwnerId(id);
 
             return View(owner);
         }

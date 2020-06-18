@@ -48,6 +48,15 @@
         </dd>
     </dl>
 </div>
+<h2>Dogs</h2>
+
+<ul>
+    @foreach (Dog dog in Model.Dogs)
+    {
+        <li>@dog.Name</li>
+    }
+</ul>
+
 <div>
     @Html.ActionLink("Edit", "Edit", new {  id = Model.Id  }) |
     <a asp-action="Index">Back to List</a>
