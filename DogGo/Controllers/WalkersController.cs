@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using DogGo.Models;
 using DogGo.Repositories;
@@ -14,20 +15,34 @@ namespace DogGo.Controllers
     public class WalkersController : Controller
     {
         private readonly WalkerRepository _walkerRepo;
+        private readonly OwnerRepository _ownerRepo;
 
         // The constructor accepts an IConfiguration object as a parameter. This class comes from the ASP.NET framework and is useful for retrieving things out of the appsettings.json file like connection strings.
         public WalkersController(IConfiguration config)
         {
             _walkerRepo = new WalkerRepository(config);
+            _ownerRepo = new OwnerRepository(config);
         }
 
         // GET: Walkers
         public ActionResult Index()
-        //This code will get all the walkers in the Walker table, convert it to a List and pass it off to the view.
+        //This code will get the walkers in the Walker table that are in the same neighborhood as the current user/owner, convert it to a List and pass it off to the view.
         {
-            List<Walker> walkers = _walkerRepo.GetAllWalkers();
+            List<Walker> walkers = new List<Walker>();
+
+            try
+            {
+                Owner currentOwner = _ownerRepo.GetOwnerById(GetCurrentUserId());
+                walkers = _walkerRepo.GetWalkersInNeighborhood(currentOwner.NeighborhoodId);
+            }
+            catch
+            {
+                walkers = _walkerRepo.GetAllWalkers();
+            }
 
             return View(walkers);
+
+
         }
 
         // GET: Walkers/Details/5
@@ -110,6 +125,13 @@ namespace DogGo.Controllers
             {
                 return View();
             }
+        }
+
+        //Get Current User's Id
+        private int GetCurrentUserId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id);
         }
     }
 }
