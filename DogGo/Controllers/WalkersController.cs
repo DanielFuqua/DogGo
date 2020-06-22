@@ -28,10 +28,21 @@ namespace DogGo.Controllers
         public ActionResult Index()
         //This code will get the walkers in the Walker table that are in the same neighborhood as the current user/owner, convert it to a List and pass it off to the view.
         {
-            Owner currentOwner = _ownerRepo.GetOwnerById(GetCurrentUserId()); 
-            List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(currentOwner.NeighborhoodId);
+            List<Walker> walkers = new List<Walker>();
+
+            try
+            {
+                Owner currentOwner = _ownerRepo.GetOwnerById(GetCurrentUserId());
+                walkers = _walkerRepo.GetWalkersInNeighborhood(currentOwner.NeighborhoodId);
+            }
+            catch
+            {
+                walkers = _walkerRepo.GetAllWalkers();
+            }
 
             return View(walkers);
+
+
         }
 
         // GET: Walkers/Details/5
